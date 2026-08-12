@@ -1,17 +1,27 @@
-name: Auto Restart Hugging Face Space
+name: Auto Restart Hugging Face Spaces
 
 on:
   schedule:
-    # ஒவ்வொரு 45 நிமிடங்களுக்கும் தானாக இயங்கும்
-    - cron: '*/45 * * * *'
+    # 45 நிமிடங்களுக்கு ஒருமுறை இயங்கும் (அதிகாலை 3:00 AM - 4:30 AM தவிர)
+    - cron: '*/45 0-2,5-23 * * *'
   workflow_dispatch:
 
 jobs:
   restart-space:
     runs-on: ubuntu-latest
     steps:
-      - name: Restart Hugging Face Space
+      - name: Restart Movie Bot Space
         run: |
           curl -X POST https://huggingface.co/api/spaces/Feros2342/my-movie-bot-24x7/restart \
+               -H "Authorization: Bearer ${{ secrets.HF_TOKEN }}"
+
+      - name: Restart UID Bot Space
+        run: |
+          curl -X POST https://huggingface.co/api/spaces/Feros2342/uidbot-space/restart \
+               -H "Authorization: Bearer ${{ secrets.HF_TOKEN }}"
+
+      - name: Restart WA Bridge Space
+        run: |
+          curl -X POST https://huggingface.co/api/spaces/Feros2342/feros-wa-bridge/restart \
                -H "Authorization: Bearer ${{ secrets.HF_TOKEN }}"
                
