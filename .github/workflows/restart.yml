@@ -1,0 +1,17 @@
+name: Auto Restart Hugging Face Space
+
+on:
+  schedule:
+    # ஒவ்வொரு 45 நிமிடங்களுக்கும் தானாக இயங்கும்
+    - cron: '*/45 * * * *'
+  workflow_dispatch:
+
+jobs:
+  restart-space:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restart Hugging Face Space
+        run: |
+          curl -X POST https://huggingface.co/api/spaces/Feros2342/my-movie-bot-24x7/restart \
+               -H "Authorization: Bearer ${{ secrets.HF_TOKEN }}"
+               
