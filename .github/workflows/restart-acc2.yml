@@ -4,7 +4,7 @@ on:
   schedule:
     # 45 நிமிடங்களுக்கு ஒருமுறை இயங்கும் (அதிகாலை 3:00 AM - 4:30 AM தவிர)
     - cron: '*/45 0-2,5-23 * * *'
-  workflow_dispatch: # தேவைப்பட்டால் நீங்களாகவே Manual-ஆகவும் Run செய்ய
+  workflow_dispatch:
 
 jobs:
   restart-acc2-space:
@@ -12,5 +12,6 @@ jobs:
     steps:
       - name: Restart Second Account Movie Bot Space
         run: |
-          curl -X POST https://huggingface.co/api/spaces/feros-stream-bot/my-movie-bot/restart \
+          curl -s -L -X POST https://huggingface.co/api/spaces/feros-stream-bot/MY-Movie-bot/restart \
                -H "Authorization: Bearer ${{ secrets.HF_TOKEN_2 }}"
+               
