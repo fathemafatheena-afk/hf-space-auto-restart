@@ -2,8 +2,8 @@ name: Auto Restart Hugging Face Spaces
 
 on:
   schedule:
-    # 45 நிமிடங்களுக்கு ஒருமுறை இயங்கும் (அதிகாலை 3:00 AM - 4:30 AM தவிர)
-    - cron: '*/45 0-2,5-23 * * *'
+    # 47 மணிநேரத்திற்கு ஒருமுறை (ஆனால் அதிகாலை 3:00 AM - 4:30 AM IST தவிர்க்கப்படும்)
+    - cron: '0 0 */2 * *'
   workflow_dispatch:
 
 jobs:
