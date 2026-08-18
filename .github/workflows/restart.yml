@@ -1,8 +1,7 @@
-Name: Auto Restart Hugging Face Spaces
+name: Auto Restart Hugging Face Spaces
 
 on:
   schedule:
-    # 47 மணிநேரத்திற்கு ஒருமுறை துல்லியமாக இயங்கும் (எப்போதும் அதிகாலை 3:30 - 4:30 AM நேரத்தில் ரீஸ்டார்ட் ஆகாது)
     - cron: '0 */47 * * *'
   workflow_dispatch:
 
@@ -24,3 +23,4 @@ jobs:
         run: |
           curl -X POST https://huggingface.co/api/spaces/Feros2342/feros-wa-bridge/restart \
                -H "Authorization: Bearer ${{ secrets.HF_TOKEN }}"
+               
