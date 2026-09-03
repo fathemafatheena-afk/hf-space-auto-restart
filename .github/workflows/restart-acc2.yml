@@ -2,8 +2,8 @@ name: Auto Restart Hugging Face Account 2
 
 on:
   schedule:
-    # சரியாக 47 மணிநேரத்திற்கு ஒருமுறை இயங்கும்
-    - cron: '0 */47 * * *'
+    # 2 நாட்களுக்கு ஒருமுறை பகல் 12:05 PM SLT (06:35 AM UTC) ரீஸ்டார்ட் ஆகும்
+    - cron: '35 6 */2 * *'
   workflow_dispatch:
 
 jobs:
@@ -14,3 +14,9 @@ jobs:
         run: |
           curl -s -L -X POST https://huggingface.co/api/spaces/feros-stream-bot/MY-Movie-bot/restart \
                -H "Authorization: Bearer ${{ secrets.HF_TOKEN_2 }}"
+
+      - name: Restart Auto Like Bot Space
+        run: |
+          curl -s -L -X POST https://huggingface.co/api/spaces/feros-stream-bot/autolike-bot/restart \
+               -H "Authorization: Bearer ${{ secrets.HF_TOKEN_2 }}"
+               
