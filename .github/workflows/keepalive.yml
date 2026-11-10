@@ -12,6 +12,14 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Keepalive Workflow
-        uses: gautamkrishnar/keepalive-workflow@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update keepalive file
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          echo "Last kept alive on: $(date)" > keepalive.txt
+          git add keepalive.txt
+          git commit -m "Automated keepalive commit [skip ci]" || exit 0
+          git push
