@@ -26,7 +26,7 @@ jobs:
 
       - name: Restart Product Space
         run: |
-          curl -X POST https://huggingface.co/api/spaces/Feros2342/product/restart \
+          curl -X POST https://huggingface.co/api/spaces/Feros2342/Product/restart \
                -H "Authorization: Bearer ${{ secrets.HF_TOKEN }}"
 
       - name: Restart CK Gaming Rewards Space
