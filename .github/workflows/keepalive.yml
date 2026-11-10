@@ -1,0 +1,17 @@
+name: Keep Repository Active
+
+on:
+  schedule:
+    # ஒவ்வொரு மாதமும் 1-ம் தேதி இயங்கி ரெபோவை எப்போதும் ஆக்டிவாக வைத்திருக்கும்
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Keepalive Workflow
+        uses: gautamkrishnar/keepalive-workflow@v2
