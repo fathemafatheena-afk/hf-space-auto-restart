@@ -23,4 +23,13 @@ jobs:
         run: |
           curl -X POST https://huggingface.co/api/spaces/Feros2342/feros-wa-bridge/restart \
                -H "Authorization: Bearer ${{ secrets.HF_TOKEN }}"
-               
+
+      - name: Restart Product Space
+        run: |
+          curl -X POST https://huggingface.co/api/spaces/Feros2342/product/restart \
+               -H "Authorization: Bearer ${{ secrets.HF_TOKEN }}"
+
+      - name: Restart CK Gaming Rewards Space
+        run: |
+          curl -X POST https://huggingface.co/api/spaces/Feros2342/ck-gaming-rewards/restart \
+               -H "Authorization: Bearer ${{ secrets.HF_TOKEN }}"
