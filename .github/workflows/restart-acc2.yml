@@ -2,21 +2,70 @@ name: Auto Restart Hugging Face Account 2
 
 on:
   schedule:
-    # 2 நாட்களுக்கு ஒருமுறை பகல் 12:05 PM SLT (06:35 AM UTC) ரீஸ்டார்ட் ஆகும்
-    - cron: '35 6 */2 * *'
+    # 46 மணிநேர சுழற்சி மற்றும் அதிகாலை 3:00 மணிக்கு முன்பான பாதுகாப்பு ரீஸ்டார்ட்
+    - cron: '0 */46 * * *'
+    - cron: '30 20 * * *'
   workflow_dispatch:
 
 jobs:
   restart-acc2-space:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Restart Second Account Movie Bot Space
-        run: |
-          curl -s -L -X POST https://huggingface.co/api/spaces/feros-stream-bot/MY-Movie-bot/restart \
-               -H "Authorization: Bearer ${{ secrets.HF_TOKEN_2 }}"
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Restart Auto Like Bot Space
+      - name: Smart 46-Hour & Pre-3AM Check and Restart
         run: |
-          curl -s -L -X POST https://huggingface.co/api/spaces/feros-stream-bot/autolike-bot/restart \
-               -H "Authorization: Bearer ${{ secrets.HF_TOKEN_2 }}"
-               
+          export TZ="Asia/Colombo"
+          CURRENT_EPOCH=$(date +%s)
+          CURRENT_HOUR=$(date +%H)
+          CURRENT_MIN=$(date +%M)
+
+          if [ -f last_restart_acc2.txt ]; then
+            LAST_EPOCH=$(cat last_restart_acc2.txt)
+          else
+            LAST_EPOCH=0
+          fi
+
+          ELAPSED_HOURS=$(( (CURRENT_EPOCH - LAST_EPOCH) / 3600 ))
+          NEXT_RESTART_HOUR=$(( (CURRENT_HOUR + (46 - ELAPSED_HOURS)) % 24 ))
+
+          SHOULD_RESTART="false"
+
+          # சாதாரணமாக 46 மணிநேரம் முடிந்தவுடன் ரீஸ்டார்ட் ஆகும்
+          if [ "$ELAPSED_HOURS" -ge 46 ] || [ "$LAST_EPOCH" -eq 0 ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            SHOULD_RESTART="true"
+          # அன்றைய தினம் 46-வது மணிநேரம் அதிகாலை 3:00 - 4:00 மணிக்குள் வரப்போகிறது என்றால், 3:00 மணிக்கு முன்பாகவே (2:00 AM) ரீஸ்டார்ட் ஆகிவிடும்
+          elif [ "$ELAPSED_HOURS" -ge 42 ] && [ "$CURRENT_HOUR" -eq 2 ] && [ "$NEXT_RESTART_HOUR" -ge 3 ] && [ "$NEXT_RESTART_HOUR" -le 4 ]; then
+            echo "Upcoming restart falls in 3:00 AM window. Triggering early before 3:00 AM!"
+            SHOULD_RESTART="true"
+          fi
+
+          # ஒருவேளை GitHub தாமதத்தால் சரியாக 3:00 AM - 4:00 AM இடைவெளியில் ரன் ஆனால், ஆட்டோ-லைக் முடியும் வரை காத்திருக்கும்
+          if [ "$CURRENT_HOUR" -eq 3 ] && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            echo "Currently inside 3:00 AM - 4:00 AM Auto-Like window. Skipping to protect Auto-Like task."
+            exit 0
+          fi
+
+          if [ "$SHOULD_RESTART" = "true" ]; then
+            echo "Restarting Account 2 Spaces at $(date)..."
+
+            curl -s -L -X POST https://huggingface.co/api/spaces/feros-stream-bot/MY-Movie-bot/restart \
+                 -H "Authorization: Bearer ${{ secrets.HF_TOKEN_2 }}"
+
+            echo ""
+
+            curl -s -L -X POST https://huggingface.co/api/spaces/feros-stream-bot/autolike-bot/restart \
+                 -H "Authorization: Bearer ${{ secrets.HF_TOKEN_2 }}"
+
+            echo "$CURRENT_EPOCH" > last_restart_acc2.txt
+            git config --global user.name 'github-actions[bot]'
+            git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+            git add last_restart_acc2.txt
+            git commit -m "Update Account 2 restart timestamp [skip ci]" || exit 0
+            git push
+          else
+            echo "Only $ELAPSED_HOURS hours elapsed. Waiting for 46-hour mark."
+          fi
